@@ -1,0 +1,106 @@
+service:
+  name: avalwyn-api
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+# Add the serverless-webpack plugin
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+       - dynamodb:Query
+       - dynamodb:Scan
+       - dynamodb:GetItem
+       - dynamodb:PutItem
+       - dynamodb:UpdateItem
+       - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:555854337660:table/avalwyn-characters"
+    - Effect: "Allow"
+      Action:
+       - dynamodb:Query
+       - dynamodb:Scan
+       - dynamodb:GetItem
+       - dynamodb:PutItem
+       - dynamodb:UpdateItem
+       - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:555854337660:table/avalwyn-factions"
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+functions:
+  retrieve_character:
+    handler: New_Avalwyn/Controllers/CharacterController.Get
+    events:
+      - http:
+          path: character/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
+  create_stub_character:
+    handler: New_Avalwyn/Controllers/CharacterController.CreateStub
+    events:
+      - http:
+          path: character/{id}
+          method: post
+          request:
+            parameters:
+              paths:
+                id: true
+  set_character_name:
+    handler: New_Avalwyn/Controllers/CharacterController.SetName
+    events:
+      - http:
+          path: character/{id}/name
+          method: post
+          request:
+            parameters:
+              paths:
+                id: true
+  set_character_description:
+    handler: New_Avalwyn/Controllers/CharacterController.SetDescription
+    events:
+      - http:
+          path: character/{id}/description
+          method: post
+          request:
+            parameters:
+              paths:
+                id: true
+  retrieve_faction:
+    handler: New_Avalwyn/Controllers/FactionController.Get
+    events:
+      - http:
+          path: faction/{faction_key}
+          method: get
+          request:
+            parameters:
+              paths:
+                faction_key: true
+  join_faction:
+    handler: New_Avalwyn/Controllers/FactionController.Join
+    events:
+      - http:
+          path: faction/{faction_key}/join/{discord_id}
+          method: post
+          request:
+            parameters:
+              paths:
+                faction_key: true
+                discord_id: true
+  initialize_factions_script:
+    handler: New_Avalwyn/Scripts/Factions.Initialize
