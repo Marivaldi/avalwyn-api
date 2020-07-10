@@ -18,6 +18,7 @@ const factions = {
             "food" : 0,
             "citizens" : 0,
             "ore" : 0,
+            "ingots": 0
         }
     },
     "hovelstead" : {
@@ -30,6 +31,7 @@ const factions = {
             "food" : 0,
             "citizens" : 0,
             "ore" : 0,
+            "ingots": 0
         }
     },
     "mkrahna" : {
@@ -42,6 +44,7 @@ const factions = {
             "food" : 0,
             "citizens" : 0,
             "ore" : 0,
+            "ingots": 0
         }
     }
 }

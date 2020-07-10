@@ -3,4 +3,5 @@ export class Resources {
     food: number = 0;
     citizens: number = 0;
     ore: number = 0;
+    ingots: number = 0;
 }
