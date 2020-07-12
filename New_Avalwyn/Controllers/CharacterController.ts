@@ -8,22 +8,15 @@ import { ConflictResponse } from '../Common/Responses/ConflictResponse';
 import { BadRequestResponse } from '../Common/Responses/BadRequestResponse';
 import { InternalServerErrorResponse } from '../Common/Responses/InternalServerErrorResponse';
 import { Character } from '../Models/Character';
+import { CharactersService } from 'Services/CharactersService';
 
 
 export const Get: APIGatewayProxyHandler = async (event, _context) => {
   try {
-    const db = new DynamoDB.DocumentClient({
-      region: 'us-east-1'
-    });
-
     const discord_id: string = event.pathParameters.id;
-    const key = { discord_id: discord_id };
-    const dbCharacter = await db.get({ TableName: "avalwyn-characters", Key: key }).promise();
+    const character: Character = await CharactersService.GetCharacter(discord_id);
 
-    const characterNotfound: boolean = !dbCharacter || _.isEmpty(dbCharacter);
-    if (characterNotfound) return new NotFoundResponse();
-
-    const character: Character = Object.assign(new Character(discord_id), dbCharacter.Item);
+    if(!character) return new NotFoundResponse(`${discord_id} not found`);
 
     return new SuccessResponse(character);
   } catch (error) {
@@ -33,24 +26,35 @@ export const Get: APIGatewayProxyHandler = async (event, _context) => {
 }
 
 
+export const Delete: APIGatewayProxyHandler = async (event, _context) => {
+  try {
+    const discord_id: string = event.pathParameters.id;
+    const character: Character = await CharactersService.GetCharacter(discord_id);
+
+    if(!character) return new NotFoundResponse(`${discord_id} not found`);
+
+    if(character.isAlreadyInAFaction()) 
+
+
+    await CharactersService.DeleteCharacter(discord_id);
+
+    return new SuccessResponse(`${discord_id} deleted.`);
+  } catch (error) {
+    console.log("ERROR!", error);
+    return new NotFoundResponse(error);
+  }
+}
+
+
 export const CreateStub: APIGatewayProxyHandler = async (event, _context) => {
   try {
-    const db = new DynamoDB.DocumentClient({
-      region: 'us-east-1'
-    });
-
     const discord_id: string = event.pathParameters.id;
-    const key = { discord_id: discord_id };
-    const dbCharacter: DynamoDB.DocumentClient.GetItemOutput = await db.get({ TableName: "avalwyn-characters", Key: key }).promise();
+    const characterExists = CharactersService.CharacterExists(discord_id);
+    if (characterExists) return new ConflictResponse(`${discord_id} already exists.`);
 
-    const characterExists: boolean = dbCharacter && !_.isEmpty(dbCharacter);
-    if (characterExists) return new ConflictResponse();
+    const stubbedCharacter = await CharactersService.CreateStubbedCharacter(discord_id);
 
-    const newCharacterTemplate = new Character(discord_id);
-
-    await db.put({ TableName: "avalwyn-characters", Item: newCharacterTemplate }).promise();
-
-    return new SuccessResponse(dbCharacter);
+    return new SuccessResponse(stubbedCharacter);
   } catch (error) {
     console.log("ERROR!", error);
     return new InternalServerErrorResponse(error.code);

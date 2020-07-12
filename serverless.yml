@@ -51,6 +51,16 @@ functions:
             parameters:
               paths:
                 id: true
+  delete_character:
+    handler: New_Avalwyn/Controllers/CharacterController.Delete
+    events:
+      - http:
+          path: character/{id}
+          method: delete
+          request:
+            parameters:
+              paths:
+                id: true
   create_stub_character:
     handler: New_Avalwyn/Controllers/CharacterController.CreateStub
     events:
