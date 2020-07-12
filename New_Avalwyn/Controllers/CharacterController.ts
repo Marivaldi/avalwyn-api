@@ -9,6 +9,8 @@ import { BadRequestResponse } from '../Common/Responses/BadRequestResponse';
 import { InternalServerErrorResponse } from '../Common/Responses/InternalServerErrorResponse';
 import { Character } from '../Models/Character';
 import { CharactersService } from 'Services/CharactersService';
+import { FactionsService } from 'Services/FactionsService';
+import { Faction } from 'Models/Faction';
 
 
 export const Get: APIGatewayProxyHandler = async (event, _context) => {
