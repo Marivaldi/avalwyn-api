@@ -35,7 +35,9 @@ export const Delete: APIGatewayProxyHandler = async (event, _context) => {
 
     if(!character) return new NotFoundResponse(`${discord_id} not found`);
 
-    if(character.isAlreadyInAFaction()) 
+    if(character.isAlreadyInAFaction()) {
+      FactionsService.LeaveFaction(new Faction(), character)
+    }
 
 
     await CharactersService.DeleteCharacter(discord_id);
